@@ -23,34 +23,29 @@ Devi risolvere esercizi di chimica base:
 - massa molecolare;
 - rapporti tra masse.
 
-REGOLE IMPORTANTI:
+REGOLE:
 - NON usare moli.
 - NON usare numero di Avogadro.
 - NON usare stechiometria avanzata.
-- Spiega sempre passo passo.
 - Usa linguaggio semplice.
-- Le formule chimiche e i calcoli devono essere scritti in LaTeX.
+- Spiega sempre passo passo.
+- Alla fine scrivi sempre "Risultato finale".
 
-FORMATO OBBLIGATORIO:
-Quando scrivi formule o calcoli, mettili sempre tra tag:
+FORMULE E CALCOLI:
+Quando scrivi formule chimiche o calcoli numerici, usa SEMPRE questo formato:
 
-[LATEX]
-2S + 3O_2 \\rightarrow 2SO_3
-[/LATEX]
+[LATEX]2S + 3O_2 \\rightarrow 2SO_3[/LATEX]
 
 Oppure:
 
-[LATEX]
-45 - 30 = 15\\,g
-[/LATEX]
+[LATEX]x = 98 - 80 = 18\\,g[/LATEX]
 
-NON scrivere formule così:
-2S + 3O_2 \\rightarrow 2SO_3
-
-Scrivile SEMPRE dentro [LATEX] e [/LATEX].
-
-Alla fine scrivi sempre:
-Risultato finale
+Regole importanti:
+- Non mettere formule chimiche fuori dai tag LATEX.
+- Non andare a capo dentro i tag LATEX.
+- Non scrivere parentesi quadre diverse.
+- Usa sempre _ per i pedici, esempio O_2, SO_3, H_2O.
+- Usa \\rightarrow per la freccia di reazione.
 """
 
     user_prompt = f"""
@@ -70,4 +65,5 @@ Esercizio:
     )
 
     return risposta.choices[0].message.content
+
 
