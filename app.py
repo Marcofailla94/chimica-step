@@ -2,6 +2,7 @@ import streamlit as st
 
 from modules.bilanciamento import bilancia_reazione, formula_to_html
 from modules.masse import calcola_massa_molecolare
+from modules.ai_solver import risolvi_con_ai
 from modules.leggi_chimiche import (
     lavoisier_due_reagenti_un_prodotto,
     lavoisier_due_reagenti_due_prodotti,
@@ -60,6 +61,7 @@ menu = st.sidebar.radio(
     "Scegli il tipo di esercizio",
     [
         "Home",
+        "Risolvi con AI",
         "Bilanciamento reazioni",
         "Legge di Lavoisier",
         "Legge di Proust",
@@ -91,6 +93,41 @@ if menu == "Home":
     """)
 
     st.info("Scegli un argomento dal menu a sinistra.")
+
+
+elif menu == "Risolvi con AI":
+    st.header("🤖 Risolvi esercizio con AI")
+
+    st.markdown("""
+    Incolla qui l'esercizio di chimica.
+
+    L'AI proverà a risolverlo passo passo, senza usare:
+    - moli;
+    - numero di Avogadro;
+    - stechiometria avanzata.
+    """)
+
+    testo_esercizio = st.text_area(
+        "Testo dell'esercizio",
+        height=250,
+        placeholder=(
+            "Esempio: L'anidride solforica reagendo con l'acqua forma acido solforico. "
+            "Se 80 g di anidride solforica formano 98 g di acido solforico, "
+            "calcola la massa di acqua."
+        )
+    )
+
+    if st.button("Risolvi con AI"):
+        if not testo_esercizio.strip():
+            st.warning("Scrivi prima l'esercizio.")
+        else:
+            with st.spinner("Sto risolvendo l'esercizio..."):
+                try:
+                    soluzione = risolvi_con_ai(testo_esercizio)
+                    st.markdown("### Soluzione")
+                    st.markdown(soluzione)
+                except Exception as e:
+                    st.error(f"Errore: {e}")
 
 
 elif menu == "Bilanciamento reazioni":
@@ -272,11 +309,6 @@ elif menu == "Legge di Proust":
     **La legge di Proust dice:**
 
     > In un composto chimico gli elementi sono sempre presenti nello stesso rapporto di massa.
-
-    Esempio:
-
-    se acqua è formata da idrogeno e ossigeno in un certo rapporto,
-    quel rapporto resta sempre uguale.
     """)
 
     tipo = st.radio(
@@ -373,9 +405,6 @@ elif menu == "Legge di Dalton":
     > Quando due elementi formano più composti, le masse di un elemento
     > che si combinano con la stessa massa dell'altro stanno tra loro
     > in rapporti semplici.
-
-    Questo tipo di esercizio serve per confrontare due composti diversi
-    formati dagli stessi elementi.
     """)
 
     col1, col2 = st.columns(2)
@@ -469,3 +498,4 @@ elif menu == "Massa molecolare":
 
         except Exception as e:
             st.error(f"Errore: {e}")
+
