@@ -3,14 +3,10 @@ import streamlit as st
 
 
 def get_openai_client():
-    api_key = st.secrets.get("OPENAI_API_KEY", None)
+    if "OPENAI_API_KEY" not in st.secrets:
+        raise ValueError("Manca OPENAI_API_KEY nei Secrets di Streamlit")
 
-    if not api_key:
-        raise ValueError(
-            "Chiave OpenAI non trovata. Inserisci OPENAI_API_KEY nei Secrets di Streamlit."
-        )
-
-    return OpenAI(api_key=api_key)
+    return OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 
 def risolvi_con_ai(testo_esercizio):
@@ -27,18 +23,34 @@ Devi risolvere esercizi di chimica base:
 - massa molecolare;
 - rapporti tra masse.
 
-Regole obbligatorie:
-- NON usare il concetto di moli.
+REGOLE IMPORTANTI:
+- NON usare moli.
 - NON usare numero di Avogadro.
 - NON usare stechiometria avanzata.
 - Spiega sempre passo passo.
 - Usa linguaggio semplice.
-- Se bilanci una reazione, conta gli atomi a sinistra e a destra.
-- Se applichi Lavoisier, evidenzia massa reagenti = massa prodotti.
-- Se applichi Proust, evidenzia il rapporto costante tra masse.
-- Se applichi Dalton, evidenzia il confronto tra rapporti semplici.
-- Se i dati non bastano, dillo chiaramente.
-- Alla fine scrivi sempre "Risultato finale".
+- Le formule chimiche e i calcoli devono essere scritti in LaTeX.
+
+FORMATO OBBLIGATORIO:
+Quando scrivi formule o calcoli, mettili sempre tra tag:
+
+[LATEX]
+2S + 3O_2 \\rightarrow 2SO_3
+[/LATEX]
+
+Oppure:
+
+[LATEX]
+45 - 30 = 15\\,g
+[/LATEX]
+
+NON scrivere formule così:
+2S + 3O_2 \\rightarrow 2SO_3
+
+Scrivile SEMPRE dentro [LATEX] e [/LATEX].
+
+Alla fine scrivi sempre:
+Risultato finale
 """
 
     user_prompt = f"""
@@ -58,3 +70,4 @@ Esercizio:
     )
 
     return risposta.choices[0].message.content
+
