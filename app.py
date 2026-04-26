@@ -1,4 +1,4 @@
-   import re
+import re
 import streamlit as st
 
 from modules.bilanciamento import bilancia_reazione, formula_to_html
