@@ -1,3 +1,4 @@
+   import re
 import streamlit as st
 
 from modules.bilanciamento import bilancia_reazione, formula_to_html
@@ -10,6 +11,30 @@ from modules.leggi_chimiche import (
     proust_verifica_composto,
     dalton_due_composti
 )
+
+
+def mostra_soluzione_formattata(testo):
+    """
+    Riconosce i blocchi [LATEX] ... [/LATEX]
+    e li mostra come formule pulite.
+    """
+
+    pattern = r"\[LATEX\]\s*(.*?)\s*\[/LATEX\]"
+    parti = re.split(pattern, testo, flags=re.DOTALL | re.IGNORECASE)
+
+    for i, parte in enumerate(parti):
+        if not parte.strip():
+            continue
+
+        if i % 2 == 1:
+            try:
+                st.markdown('<div class="formula-box">', unsafe_allow_html=True)
+                st.latex(parte.strip())
+                st.markdown('</div>', unsafe_allow_html=True)
+            except Exception:
+                st.code(parte.strip())
+        else:
+            st.markdown(parte)
 
 
 st.set_page_config(
@@ -37,12 +62,13 @@ st.markdown("""
     border-radius: 10px;
     margin-bottom: 15px;
 }
-.info-box {
-    background-color: #f7f9fb;
-    border: 1px solid #d9e2ec;
-    padding: 16px;
-    border-radius: 10px;
-    margin-bottom: 15px;
+.formula-box {
+    background-color: #f0fdf9;
+    border: 2px solid #00a86b;
+    border-radius: 12px;
+    padding: 18px;
+    margin: 15px 0;
+    text-align: center;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -50,7 +76,7 @@ st.markdown("""
 
 st.markdown('<div class="main-title">🧪 Chimica Step</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="subtitle">Risolutore guidato per chimica - livello primo anno liceo classico</div>',
+    '<div class="subtitle">Risolutore guidato per chimica - primo anno liceo classico</div>',
     unsafe_allow_html=True
 )
 
@@ -75,22 +101,15 @@ if menu == "Home":
     st.header("Benvenuto")
 
     st.markdown("""
-    Questa app aiuta a risolvere esercizi di chimica spiegando i passaggi.
+Questa app risolve esercizi di chimica spiegando i passaggi.
 
-    È pensata per il primo anno di liceo classico, quindi usa solo concetti base:
+È pensata per il primo anno di liceo classico.
 
-    - atomi;
-    - formule chimiche;
-    - reazioni chimiche;
-    - conservazione della massa;
-    - rapporti tra masse;
-    - massa molecolare.
-
-    Non usa:
-    - moli;
-    - numero di Avogadro;
-    - stechiometria avanzata.
-    """)
+Non usa:
+- moli;
+- numero di Avogadro;
+- stechiometria avanzata.
+""")
 
     st.info("Scegli un argomento dal menu a sinistra.")
 
@@ -99,13 +118,10 @@ elif menu == "Risolvi con AI":
     st.header("🤖 Risolvi esercizio con AI")
 
     st.markdown("""
-    Incolla qui l'esercizio di chimica.
+Incolla qui l'esercizio di chimica.
 
-    L'AI proverà a risolverlo passo passo, senza usare:
-    - moli;
-    - numero di Avogadro;
-    - stechiometria avanzata.
-    """)
+L'AI risolverà passo passo usando formule e calcoli scritti bene.
+""")
 
     testo_esercizio = st.text_area(
         "Testo dell'esercizio",
@@ -125,7 +141,7 @@ elif menu == "Risolvi con AI":
                 try:
                     soluzione = risolvi_con_ai(testo_esercizio)
                     st.markdown("### Soluzione")
-                    st.markdown(soluzione)
+                    mostra_soluzione_formattata(soluzione)
                 except Exception as e:
                     st.error(f"Errore: {e}")
 
@@ -134,14 +150,13 @@ elif menu == "Bilanciamento reazioni":
     st.header("⚖️ Bilanciamento reazioni")
 
     st.markdown("""
-    Scrivi la reazione usando la freccia `->`.
+Scrivi la reazione usando `->`.
 
-    Esempi:
-
-    - `Fe + O2 -> Fe2O3`
-    - `H3PO4 + NaOH -> Na2HPO4 + H2O`
-    - `Mn(OH)2 + H3PO4 -> Mn3(PO4)2 + H2O`
-    """)
+Esempi:
+- `Fe + O2 -> Fe2O3`
+- `H3PO4 + NaOH -> Na2HPO4 + H2O`
+- `Mn(OH)2 + H3PO4 -> Mn3(PO4)2 + H2O`
+""")
 
     reazione = st.text_input(
         "Inserisci la reazione",
@@ -172,14 +187,10 @@ elif menu == "Legge di Lavoisier":
     st.header("⚖️ Legge di Lavoisier")
 
     st.markdown("""
-    **La legge di Lavoisier dice:**
+**La legge di Lavoisier dice:**
 
-    > In una reazione chimica la massa totale dei reagenti è uguale alla massa totale dei prodotti.
-
-    In parole semplici:
-
-    > nulla si crea e nulla si distrugge.
-    """)
+> La massa totale dei reagenti è uguale alla massa totale dei prodotti.
+""")
 
     tipo = st.radio(
         "Scegli il tipo di esercizio",
@@ -190,7 +201,7 @@ elif menu == "Legge di Lavoisier":
     )
 
     if tipo == "Due reagenti e un prodotto":
-        st.subheader("Esempio: A + B → C")
+        st.subheader("A + B → C")
 
         col1, col2 = st.columns(2)
 
@@ -240,7 +251,7 @@ elif menu == "Legge di Lavoisier":
                 st.write(passo)
 
     else:
-        st.subheader("Esempio: A + B → C + D")
+        st.subheader("A + B → C + D")
 
         col1, col2 = st.columns(2)
 
@@ -306,10 +317,10 @@ elif menu == "Legge di Proust":
     st.header("📏 Legge di Proust")
 
     st.markdown("""
-    **La legge di Proust dice:**
+**La legge di Proust dice:**
 
-    > In un composto chimico gli elementi sono sempre presenti nello stesso rapporto di massa.
-    """)
+> In un composto gli elementi sono sempre presenti nello stesso rapporto di massa.
+""")
 
     tipo = st.radio(
         "Scegli il tipo di esercizio",
@@ -400,12 +411,11 @@ elif menu == "Legge di Dalton":
     st.header("🔢 Legge di Dalton")
 
     st.markdown("""
-    **La legge di Dalton dice:**
+**La legge di Dalton dice:**
 
-    > Quando due elementi formano più composti, le masse di un elemento
-    > che si combinano con la stessa massa dell'altro stanno tra loro
-    > in rapporti semplici.
-    """)
+> Quando due elementi formano più composti, le masse di un elemento che si combinano
+> con la stessa massa dell'altro stanno tra loro in rapporti semplici.
+""")
 
     col1, col2 = st.columns(2)
 
@@ -460,17 +470,15 @@ elif menu == "Massa molecolare":
     st.header("🧮 Massa molecolare")
 
     st.markdown("""
-    La massa molecolare si calcola sommando le masse atomiche
-    di tutti gli atomi presenti nella formula.
+La massa molecolare si calcola sommando le masse atomiche di tutti gli atomi presenti nella formula.
 
-    Esempi:
-
-    - `H2O`
-    - `CO2`
-    - `H3PO4`
-    - `Ca(OH)2`
-    - `Mn3(PO4)2`
-    """)
+Esempi:
+- `H2O`
+- `CO2`
+- `H3PO4`
+- `Ca(OH)2`
+- `Mn3(PO4)2`
+""")
 
     formula = st.text_input(
         "Inserisci la formula chimica",
@@ -498,4 +506,5 @@ elif menu == "Massa molecolare":
 
         except Exception as e:
             st.error(f"Errore: {e}")
+
 
